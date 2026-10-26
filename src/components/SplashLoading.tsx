@@ -1,22 +1,28 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+  const [fadeOut, setFadeOut] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onComplete();
-    }, 4000);
+      setFadeOut(true);
+      setTimeout(onComplete, 700); // Wait for fade out transition
+    }, 2200);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-[#1b1e24] flex flex-col items-center justify-center z-50">
-      <div className="w-24 h-24 rounded-full bg-[#714b67] flex items-center justify-center animate-orb shadow-2xl">
-        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
+    <div className={`fixed inset-0 z-50 bg-[#0B0F0E] flex flex-col items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className="relative flex items-center justify-center">
+        {/* Geometric Logo Emblem */}
+        <div className="w-20 h-20 bg-[#CCFF00] rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(204,255,0,0.3)] transform rotate-6 animate-pulse">
+          <span className="text-[#0B0F0E] font-black text-4xl tracking-tighter">E</span>
+        </div>
       </div>
-      <h1 className="text-white text-2xl font-bold tracking-[0.3em] mt-8">ELITEJOBS RWANDA</h1>
-      <p className="text-gray-400 text-xs tracking-[0.2em] mt-2 uppercase font-medium">Enterprise Hyper-Platform OS</p>
+      <div className="mt-6 text-center">
+        <h1 className="text-white text-2xl font-bold tracking-widest uppercase">EliteJobs</h1>
+        <p className="text-[#CCFF00] text-xs font-mono tracking-widest mt-1 uppercase">Rwanda Enterprise OS</p>
+      </div>
     </div>
   );
 };
