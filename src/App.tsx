@@ -3,6 +3,7 @@ import { SplashLoading } from './components/SplashLoading';
 import { AuthSlider } from './components/AuthSlider';
 import { AttendanceModule } from './components/AttendanceModule';
 import { ITAttendanceGenerator } from './components/ITAttendanceGenerator';
+import { RecruitmentCRM } from './components/RecruitmentCRM';
 
 export function App() {
   const [loading, setLoading] = useState(true);
@@ -24,9 +25,12 @@ export function App() {
     );
   }
 
-  // Route to IT QR Generator if position is IT Support, otherwise regular attendance scanner
   if (userPosition === 'IT Support') {
     return <ITAttendanceGenerator />;
+  }
+
+  if (userPosition === 'HR Manager' || userPosition === 'Admin / Owner') {
+    return <RecruitmentCRM />;
   }
 
   return <AttendanceModule />;
