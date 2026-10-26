@@ -6,6 +6,7 @@ import { AttendanceModule } from './components/AttendanceModule';
 import { ITAttendanceGenerator } from './components/ITAttendanceGenerator';
 import { RecruitmentCRM } from './components/RecruitmentCRM';
 import { AdminAttendanceReview } from './components/AdminAttendanceReview';
+import { ReceptionistVisitorDesk } from './components/ReceptionistVisitorDesk';
 
 export function App() {
   const [loading, setLoading] = useState(true);
@@ -29,7 +30,6 @@ export function App() {
     }
   }, []);
 
-  // Real-time listener for instant session revocation (Quit Colleague kill-switch)
   useEffect(() => {
     if (!authenticated || !username) return;
 
@@ -85,6 +85,8 @@ export function App() {
             return <AdminAttendanceReview />;
           case 'HR Manager':
             return <RecruitmentCRM />;
+          case 'Receptionist / Customer Care':
+            return <ReceptionistVisitorDesk />;
           default:
             return <AttendanceModule />;
         }
