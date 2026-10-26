@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SplashLoading } from './components/SplashLoading';
 import { AuthSlider } from './components/AuthSlider';
 import { AttendanceModule } from './components/AttendanceModule';
@@ -10,7 +10,21 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [userPosition, setUserPosition] = useState('IT Support');
-  const [activeTab, setActiveTab] = useState<'AUTO' | 'CRM' | 'INVOICING'>('AUTO');
+
+  useEffect(() => {
+    const session = localStorage.getItem('elite_session');
+    if (session) {
+      try {
+        const parsed = JSON.parse(session);
+        if (parsed.position) {
+          setUserPosition(parsed.position);
+          setAuthenticated(true);
+        }
+      } catch (e) {
+        // invalid session
+      }
+    }
+  }, []);
 
   if (loading) {
     return <SplashLoading onComplete={() => setLoading(false)} />;
@@ -27,27 +41,34 @@ export function App() {
     );
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('elite_session');
+    setAuthenticated(false);
+  };
+
   return (
     <div className="relative min-h-screen">
-      {/* Global Module Navigation Bar */}
+      {/* Universal Top Bar for Role Awareness & Logout */}
       <div className="fixed top-3 right-5 z-50 bg-[#1b1e24] text-white px-4 py-2 rounded-full text-xs font-semibold flex items-center space-x-3 shadow-xl border border-gray-700">
-        <span className="text-gray-400 font-mono">ROLE: {userPosition}</span>
-        <button onClick={() => setActiveTab('AUTO')} className={`hover:text-amber-400 ${activeTab === 'AUTO' ? 'text-amber-400 font-bold' : ''}`}>Workspace</button>
-        <button onClick={() => setActiveTab('CRM')} className={`hover:text-amber-400 ${activeTab === 'CRM' ? 'text-amber-400 font-bold' : ''}`}>CRM</button>
-        <button onClick={() => setActiveTab('INVOICING')} className={`hover:text-amber-400 ${activeTab === 'INVOICING' ? 'text-amber-400 font-bold' : ''}`}>Invoicing</button>
+        <span className="text-amber-400 font-mono">ROLE: {userPosition.toUpperCase()}</span>
+        <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 border-l border-gray-700 pl-3">Log Out</button>
       </div>
 
-      {activeTab === 'CRM' ? (
-        <RecruitmentCRM />
-      ) : activeTab === 'INVOICING' ? (
-        <ClientInvoicing />
-      ) : userPosition === 'IT Support' ? (
-        <ITAttendanceGenerator />
-      ) : userPosition === 'HR Manager' || userPosition === 'Admin / Owner' ? (
-        <RecruitmentCRM />
-      ) : (
-        <AttendanceModule />
-      )}
+      {/* Strict Role-Based Workspace Routing */}
+      {(() => {
+        switch (userPosition) {
+          case 'IT Support':
+            return <ITAttendanceGenerator />;
+          case 'HR Manager':
+            return <RecruitmentCRM />;
+          case 'Receptionist / Customer Care':
+            return <AttendanceModule />;
+          case 'Admin / Owner':
+            return <ClientInvoicing />;
+          default:
+            return <AttendanceModule />;
+        }
+      })()}
     </div>
   );
 }
