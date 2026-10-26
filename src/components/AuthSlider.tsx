@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 export const AuthSlider: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -42,7 +42,7 @@ export const AuthSlider: React.FC<{ onAuthenticated: () => void }> = ({ onAuthen
             <button type="submit" className="w-full py-3 bg-[#714b67] text-white font-bold rounded-lg shadow-md hover:bg-[#5b3c52]">REGISTER POSITION</button>
           </form>
         </div>
-        <div className={bsolute top-0 bottom-0 w-1/2 bg-[#714b67] text-white p-12 flex flex-col items-center justify-center text-center transition-transform duration-500 ease-in-out z-20 }>
+        <div className={`absolute top-0 bottom-0 w-1/2 bg-[#714b67] text-white p-12 flex flex-col items-center justify-center text-center transition-transform duration-500 ease-in-out z-20 ${isSignUp ? 'translate-x-0' : 'translate-x-full'}`}>
           <h2 className="text-3xl font-bold mb-4">{isSignUp ? "Already Registered?" : "New Colleague?"}</h2>
           <p className="text-sm text-gray-200 mb-8">{isSignUp ? "Slide back to Sign In and access your secure department workspace." : "Create your credentials using your company invite code."}</p>
           <button onClick={() => setIsSignUp(!isSignUp)} className="px-8 py-3 bg-white text-[#714b67] font-bold rounded-lg shadow-lg hover:bg-gray-100">{isSignUp ? "SIGN IN" : "CREATE ACCOUNT"}</button>
