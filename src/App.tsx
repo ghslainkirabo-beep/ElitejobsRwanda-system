@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from './lib/supabase';
 import { SplashLoading } from './components/SplashLoading';
 import { AuthSlider } from './components/AuthSlider';
 import { AttendanceModule } from './components/AttendanceModule';
@@ -9,6 +10,7 @@ import { AdminAttendanceReview } from './components/AdminAttendanceReview';
 export function App() {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
   const [userPosition, setUserPosition] = useState('IT Support');
 
   useEffect(() => {
@@ -18,6 +20,7 @@ export function App() {
         const parsed = JSON.parse(session);
         if (parsed.position) {
           setUserPosition(parsed.position);
+          setUsername(parsed.username || '');
           setAuthenticated(true);
         }
       } catch (e) {
@@ -25,6 +28,25 @@ export function App() {
       }
     }
   }, []);
+
+  // Real-time listener for instant session revocation (Quit Colleague kill-switch)
+  useEffect(() => {
+    if (!authenticated || !username) return;
+
+    const channel = supabase.channel('user_revocation');
+    channel
+      .on('broadcast', { event: 'REVOKE_USER' }, (payload) => {
+        if (payload.payload && payload.payload.username === username) {
+          alert('⚠️ YOUR EMPLOYMENT ACCESS HAS BEEN REVOKED BY IT / ADMIN.\nLogging out immediately.');
+          handleLogout();
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [authenticated, username]);
 
   if (loading) {
     return <SplashLoading onComplete={() => setLoading(false)} />;
