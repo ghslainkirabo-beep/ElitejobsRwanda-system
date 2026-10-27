@@ -6,7 +6,7 @@ interface CompanyAsset {
   serialNumber: string;
   category: 'Laptop' | 'Mobile Device' | 'Access Card' | 'Networking';
   assignedTo: string;
-  status: 'ASSIGNED' | 'IN_STOCK' | 'UNDER_MAINTENANCE' | 'SYSTEM_ERROR';
+  status: 'ASSIGNED' | 'IN_STOCK' | 'UNDER_MAINTENANCE' | 'SYSTEM_ERROR' | 'REPLACED_PURCHASED';
   condition: 'Excellent' | 'Good' | 'Fair' | 'Critical';
   lastAuditDate: string;
 }
@@ -37,13 +37,13 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
     },
     {
       id: 'AST-003',
-      itemName: 'Cisco Router AX-3000',
-      serialNumber: 'CS-77192039',
-      category: 'Networking',
+      itemName: 'Samsung Galaxy A32',
+      serialNumber: 'SM-33920192',
+      category: 'Mobile Device',
       assignedTo: 'Unassigned',
-      status: 'UNDER_MAINTENANCE',
-      condition: 'Fair',
-      lastAuditDate: '2026-10-25',
+      status: 'IN_STOCK',
+      condition: 'Good',
+      lastAuditDate: '2026-10-22',
     },
     {
       id: 'AST-004',
@@ -57,11 +57,19 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
     },
   ]);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showReplaceModal, setShowReplaceModal] = useState(false);
+  const [selectedDamagedAsset, setSelectedDamagedAsset] = useState<CompanyAsset | null>(null);
+
+  // Form states for new registration
   const [itemName, setItemName] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
   const [category, setCategory] = useState<CompanyAsset['category']>('Laptop');
   const [assignedTo, setAssignedTo] = useState('Unassigned');
+
+  // Form states for replacement purchase
+  const [newItemName, setNewItemName] = useState('');
+  const [newSerialNumber, setNewSerialNumber] = useState('');
 
   // Admin Statistics Calculations
   const totalAssets = assets.length;
@@ -84,9 +92,42 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
     };
 
     setAssets([newAsset, ...assets]);
-    setShowModal(false);
+    setShowRegisterModal(false);
     setItemName('');
     setSerialNumber('');
+  };
+
+  // IT Workflow: Handle Replace / New Purchase for Damaged Asset
+  const handleReplaceAssetSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDamagedAsset) return;
+
+    const assignedStaff = selectedDamagedAsset.assignedTo;
+
+    // 1. Update old damaged asset: Mark as REPLACED_PURCHASED & unassign staff
+    const updatedAssets = assets.map((a) =>
+      a.id === selectedDamagedAsset.id
+        ? { ...a, status: 'REPLACED_PURCHASED' as const, condition: 'Critical' as const, assignedTo: `Decommissioned (${assignedStaff})` }
+        : a
+    );
+
+    // 2. Add newly purchased asset assigned directly to the colleague
+    const newReplacementAsset: CompanyAsset = {
+      id: `AST-00${updatedAssets.length + 1}`,
+      itemName: newItemName,
+      serialNumber: newSerialNumber,
+      category: selectedDamagedAsset.category,
+      assignedTo: assignedStaff,
+      status: 'ASSIGNED',
+      condition: 'Excellent',
+      lastAuditDate: new Date().toISOString().split('T')[0],
+    };
+
+    setAssets([newReplacementAsset, ...updatedAssets]);
+    setShowReplaceModal(false);
+    setSelectedDamagedAsset(null);
+    setNewItemName('');
+    setNewSerialNumber('');
   };
 
   const handleUpdateStatus = (id: string, newStatus: CompanyAsset['status']) => {
@@ -104,12 +145,12 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
         </div>
         <div className="p-4 space-y-2 text-sm font-medium text-gray-600">
           <div className="p-2.5 bg-[#f0f2f5] text-[#714b67] rounded-lg font-bold cursor-pointer">
-            {isIT ? '💻 Deep Equipment Control' : '📈 Executive Statistics'}
+            {isIT ? '💻 Equipment Control' : '📈 Executive Statistics'}
           </div>
           {isIT && (
             <>
-              <div className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer">🔧 Maintenance Queue</div>
-              <div className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer">⚠️ Hardware System Errors</div>
+              <div className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer">📦 Vault (In Stock)</div>
+              <div className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer">⚠️ Error & Damaged Queue</div>
             </>
           )}
         </div>
@@ -120,17 +161,17 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-[#303133]">
-              {isIT ? 'IT Master Equipment & Maintenance Console' : 'Executive Hardware Usage & Health Statistics'}
+              {isIT ? 'IT Master Equipment & Replacement Console' : 'Executive Hardware Usage & Health Statistics'}
             </h1>
             <p className="text-sm text-gray-500">
               {isIT
-                ? 'Full deep control over serial numbers, hardware diagnostics, and colleague device assignments.'
+                ? 'Manage serial numbers, process hardware errors, and register newly purchased replacements.'
                 : 'High-level overview of enterprise hardware integrity, maintenance rates, and error logs.'}
             </p>
           </div>
           {isIT && (
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowRegisterModal(true)}
               className="px-4 py-2 bg-[#714b67] text-white font-bold text-xs rounded-lg shadow hover:bg-[#5b3c52]"
             >
               + REGISTER NEW ASSET
@@ -204,30 +245,47 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
                   <td className="p-4">
                     <span
                       className={`px-2.5 py-1 text-xs font-bold rounded-full ${
-                        a.status === 'ASSIGNED' || a.status === 'IN_STOCK'
+                        a.status === 'ASSIGNED'
+                          ? 'bg-purple-100 text-purple-700'
+                          : a.status === 'IN_STOCK'
                           ? 'bg-green-100 text-green-700'
                           : a.status === 'UNDER_MAINTENANCE'
                           ? 'bg-amber-100 text-amber-800'
-                          : 'bg-red-100 text-red-700'
+                          : a.status === 'SYSTEM_ERROR'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-gray-200 text-gray-700'
                       }`}
                     >
                       {a.status.replace('_', ' ')}
                     </span>
                   </td>
 
-                  {/* IT-ONLY DEEP ACTIONS */}
+                  {/* IT-ONLY ACTIONS */}
                   {isIT && (
-                    <td className="p-4">
+                    <td className="p-4 flex items-center space-x-2">
                       <select
                         value={a.status}
                         onChange={(e) => handleUpdateStatus(a.id, e.target.value as CompanyAsset['status'])}
                         className="text-xs bg-gray-100 border border-gray-300 rounded px-2 py-1 font-bold focus:outline-none"
                       >
-                        <option value="ASSIGNED">Assigned / Working</option>
-                        <option value="IN_STOCK">In Stock</option>
-                        <option value="UNDER_MAINTENANCE">Set to Maintenance</option>
-                        <option value="SYSTEM_ERROR">Flag System Error</option>
+                        <option value="ASSIGNED">Assigned / Active</option>
+                        <option value="IN_STOCK">In Stock (Vault)</option>
+                        <option value="UNDER_MAINTENANCE">Maintenance</option>
+                        <option value="SYSTEM_ERROR">System Error</option>
                       </select>
+
+                      {(a.status === 'SYSTEM_ERROR' || a.status === 'UNDER_MAINTENANCE') && (
+                        <button
+                          onClick={() => {
+                            setSelectedDamagedAsset(a);
+                            setShowReplaceModal(true);
+                          }}
+                          className="px-2.5 py-1 bg-red-600 text-white font-bold text-xs rounded hover:bg-red-700"
+                          title="Register newly purchased device for this staff member"
+                        >
+                          Replace New 🔄
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -237,8 +295,8 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
         </div>
       </div>
 
-      {/* IT Register Modal */}
-      {showModal && isIT && (
+      {/* IT Register New Asset Modal */}
+      {showRegisterModal && isIT && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Register New Equipment (IT Master)</h2>
@@ -280,7 +338,7 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
               <div className="flex justify-end space-x-2 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => setShowRegisterModal(false)}
                   className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg"
                 >
                   CANCEL
@@ -290,6 +348,60 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
                   className="px-4 py-2 text-xs font-bold bg-[#714b67] text-white rounded-lg shadow hover:bg-[#5b3c52]"
                 >
                   SAVE & REGISTER
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* IT Replace / New Purchase Modal */}
+      {showReplaceModal && selectedDamagedAsset && isIT && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border-2 border-red-500">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">Replace Damaged Asset</h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Registering newly purchased replacement for <strong className="text-red-600">{selectedDamagedAsset.assignedTo}</strong>.
+            </p>
+
+            <form onSubmit={handleReplaceAssetSubmit} className="space-y-3">
+              <div className="p-3 bg-red-50 text-red-800 rounded-lg text-xs font-mono mb-2">
+                Replacing: {selectedDamagedAsset.itemName} (S/N: {selectedDamagedAsset.serialNumber})
+              </div>
+
+              <input
+                type="text"
+                placeholder="New Purchased Model (e.g. MacBook Pro M3)"
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                required
+              />
+              <input
+                type="text"
+                placeholder="New Serial Number"
+                value={newSerialNumber}
+                onChange={(e) => setNewSerialNumber(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono"
+                required
+              />
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowReplaceModal(false);
+                    setSelectedDamagedAsset(null);
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-xs font-bold bg-red-600 text-white rounded-lg shadow hover:bg-red-700"
+                >
+                  CONFIRM REPLACEMENT & ASSIGN
                 </button>
               </div>
             </form>
