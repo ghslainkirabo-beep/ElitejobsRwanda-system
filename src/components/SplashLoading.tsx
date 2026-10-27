@@ -73,16 +73,21 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
         </svg>
       </div>
 
-      {/* Instant Sleek Brand Text Reveal */}
+      {/* Brand Title Reveal */}
       <div
         style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-        className={`mt-1 transition-all duration-400 transform ${
+        className={`mt-1 transition-all duration-400 transform flex flex-col items-center ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}
       >
-        <h1 className="text-white text-sm font-bold tracking-[0.3em] uppercase font-mono">
+        <h1 className="text-white text-sm font-bold tracking-[0.3em] uppercase font-mono mb-4">
           ELITEJOBS<span className="text-[#CCFF00]">.RW</span>
         </h1>
+
+        {/* APPLE-STYLE FLUID SPINNER MOTION (ALTUVERA STYLE) */}
+        <div className="relative w-5 h-5 flex items-center justify-center">
+          <div className="w-5 h-5 border-2 border-white/15 border-t-[#CCFF00] rounded-full animate-spin"></div>
+        </div>
       </div>
     </div>
   );
