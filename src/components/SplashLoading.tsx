@@ -98,7 +98,6 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
 
-      // 1. 0 to 0.6s: Background & dim "e" fade in, dot pulse
       if (elapsed <= 600) {
         const p = elapsed / 600;
         const easeP = smootherstep(p);
@@ -109,7 +108,6 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
         if (dotGroupRef.current) dotGroupRef.current.setAttribute('opacity', '1');
       }
 
-      // Dot pulse
       const pulseCycle = (elapsed % 1600) / 1600;
       const pulseScale = 1 + 0.12 * Math.sin(pulseCycle * Math.PI * 2);
       if (dotCircleRef.current) {
@@ -123,7 +121,6 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
         dotGlowRingRef.current.setAttribute('opacity', (0.5 + 0.3 * Math.sin(pulseCycle * Math.PI * 2)).toString());
       }
 
-      // 2. 0.5 to 3.7s: Sweep clockwise & progress bar
       if (elapsed >= 500 && elapsed <= 3700) {
         const sweepP = (elapsed - 500) / 3200;
         const easeSweep = smootherstep(sweepP);
@@ -135,13 +132,11 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
         if (progressFillRef.current) progressFillRef.current.style.width = '100%';
       }
 
-      // 3. 3.7 to 4.5s: Completion FX
       if (elapsed >= 3700 && !fxTriggered) {
         fxTriggered = true;
         triggerCompletionFX();
       }
 
-      // 4. 4.1 to 4.9s: Logo lifts up, text fades in + slides up 8px
       if (elapsed >= 4100 && elapsed <= 4900) {
         const textP = (elapsed - 4100) / 800;
         const easeText = smootherstep(textP);
@@ -176,7 +171,7 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
   return (
     <div 
       ref={preloaderRef}
-      style={{ background: 'radial-gradient(circle at center, #1C2233 0%, #090B11 100%)' }}
+      style={{ background: 'radial-gradient(circle at center, #1C2233 0%, #12151F 100%)' }}
       className="fixed inset-0 w-screen h-screen flex flex-col items-center justify-center z-[99999] transition-opacity duration-500 overflow-hidden select-none font-sans"
     >
       <div ref={loaderWrapperRef} className="relative flex flex-col items-center w-full max-w-[400px]">
@@ -188,7 +183,7 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
         >
           <defs>
             <radialGradient id="dotGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FFE27A" stopOpacity="0.8"/>
+              <stop offset="0%" stopColor="#FAD201" stopOpacity="0.8"/>
               <stop offset="100%" stopColor="#FAD201" stopOpacity="0"/>
             </radialGradient>
             <mask id="sweepMask">
@@ -199,18 +194,18 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
 
           <g ref={fxGroupRef}></g>
 
-          {/* DIM LOGO */}
+          {/* DIM LOGO #1C2233 */}
           <path 
             ref={dimLogoRef}
             d="M125.0 43.8 L123.2 45.0 L123.2 84.5 L124.5 85.5 L131.2 85.8 L140.5 88.5 L146.0 91.8 L151.2 96.5 L155.2 102.0 L158.2 108.2 L160.2 116.0 L160.5 122.8 L159.2 123.5 L33.8 123.5 L32.5 125.2 L31.2 136.8 L31.5 154.5 L35.5 176.2 L41.2 191.2 L51.5 207.8 L64.0 220.8 L79.5 231.2 L89.2 235.8 L98.2 238.8 L120.5 242.8 L141.2 242.5 L162.2 238.8 L174.5 234.5 L183.2 230.2 L199.0 219.0 L208.8 209.2 L208.8 208.0 L172.5 178.2 L171.0 178.5 L164.2 185.5 L158.8 189.5 L152.0 193.0 L144.8 195.5 L136.8 197.0 L126.8 197.2 L116.5 196.0 L109.8 194.0 L101.2 189.5 L93.8 182.0 L88.8 172.5 L86.5 159.5 L88.2 158.2 L214.0 158.2 L215.0 157.0 L214.8 130.8 L211.8 111.0 L206.0 93.5 L201.2 84.0 L196.5 76.8 L184.8 63.8 L171.8 54.5 L158.2 48.5 L140.8 44.5 Z" 
-            fill="#222839" 
+            fill="#1C2233" 
             opacity="0" 
           />
 
-          {/* LIT LOGO */}
+          {/* LIT LOGO #FFFFFF */}
           <g mask="url(#sweepMask)">
             <path 
-              d="M125.0 43.8 L123.2 45.0 L123.2 84.5 L124.5 85.5 L131.2 85.8 L140.5 88.5 L146.0 91.8 L151.2 96.5 L155.2 102.0 L158.2 108.2 L160.2 116.0 L160.5 122.8 L159.2 123.5 L33.8 123.5 L32.5 125.2 L31.2 136.8 L31.5 154.5 L35.5 176.2 L41.2 191.2 L51.5 207.8 L64.0 220.8 L79.5 231.2 L89.2 235.8 L98.2 238.8 L120.5 242.8 L141.2 242.5 L162.2 238.8 L174.5 234.5 L183.2 230.2 L199.0 219.0 L208.8 209.2 L208.8 208.0 L172.5 178.2 L171.0 178.5 L164.2 185.5 L158.8 189.5 L152.0 193.0 L144.8 195.5 L136.8 197.0 L126.8 197.2 L116.5 196.0 L109.8 194.0 L101.2 189.5 L93.8 182.0 L88.8 172.5 L86.5 159.5 L88.2 158.2 L214.0 158.2 L215.0 157.0 L214.8 130.8 L211.8 111.0 L206.0 93.5 L201.2 84.0 L196.5 76.8 L184.8 63.8 L171.8 54.5 L158.2 48.5 L140.8 44.5 Z" 
+              d="M125.0 43.8 L123.2 45.0 L123.2 84.5 L124.5 85.5 L131.2 85.8 L140.5 88.5 L146.0 91.8 L151.2 96.5 L155.2 102.0 L158.2 108.2 L160.2 116.0 L160.5 122.8 L159.2 123.5 L33.8 123.5 L32.5 125.2 L31.2 136.8 L31.5 154.5 L35.5 176.2 L41.2 191.2 L51.5 207.8 L64.0 220.8 L79.5 231.2 L89.2 235.8 L98.2 238.8 L120.5 242.8 L141.2 242.5 L162.2 238.8 L174.5 234.5 L183.2 230.2 L199.0 219.0 L208.8 208.0 L172.5 178.2 L171.0 178.5 L164.2 185.5 L158.8 189.5 L152.0 193.0 L144.8 195.5 L136.8 197.0 L126.8 197.2 L116.5 196.0 L109.8 194.0 L101.2 189.5 L93.8 182.0 L88.8 172.5 L86.5 159.5 L88.2 158.2 L214.0 158.2 L215.0 157.0 L214.8 130.8 L211.8 111.0 L206.0 93.5 L201.2 84.0 L196.5 76.8 L184.8 63.8 L171.8 54.5 L158.2 48.5 L140.8 44.5 Z" 
               fill="#FFFFFF" 
             />
           </g>
@@ -222,9 +217,9 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
           </g>
         </svg>
 
-        {/* PROGRESS BAR */}
-        <div ref={progressTrackRef} className="w-[120px] h-[2.4px] bg-[#222839] rounded-full mt-8 overflow-hidden opacity-100 transition-opacity duration-400">
-          <div ref={progressFillRef} className="w-0 h-full bg-white rounded-full"></div>
+        {/* PROGRESS BAR (#FAD201 on #1C2233) */}
+        <div ref={progressTrackRef} className="w-[120px] h-[2.4px] bg-[#1C2233] rounded-full mt-8 overflow-hidden opacity-100 transition-opacity duration-400">
+          <div ref={progressFillRef} className="w-0 h-full bg-[#FAD201] rounded-full"></div>
         </div>
 
         {/* BRAND TEXT */}
@@ -233,8 +228,8 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
           className="absolute top-[calc(40vmin+45px)] text-[1.1rem] tracking-[0.05em] whitespace-nowrap opacity-0 translate-y-[8px] transition-all duration-800"
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
-          <span className="font-bold text-white">Elite</span>
-          <span className="font-light text-white/85">jobs</span>
+          <span className="font-bold text-[#FFFFFF]">Elite</span>
+          <span className="font-light text-[#FFFFFF]/85">jobs</span>
           <span className="font-bold text-[#FAD201]">Rwanda</span>
         </div>
       </div>

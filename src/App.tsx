@@ -14,24 +14,25 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-white flex flex-col selection:bg-[#CCFF00] selection:text-black">
-      {/* Top Navigation */}
-      <header className="border-b border-white/10 bg-[#0A0D14]/80 backdrop-blur-2xl sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#12151F] text-[#FFFFFF] flex flex-col font-sans">
+      
+      {/* HEADER BAR (#12151F & #1C2233 NAV) */}
+      <header className="border-b border-[#E3E6EC]/10 bg-[#12151F] sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#121816] border border-[#CCFF00]/40 rounded-xl flex items-center justify-center text-[#CCFF00] font-black text-xs font-mono">
+          <div className="w-8 h-8 bg-[#1C2233] border border-[#FAD201]/40 rounded-xl flex items-center justify-center text-[#FAD201] font-black text-xs font-mono">
             e
           </div>
-          <span className="font-black tracking-tight uppercase text-sm">
-            EliteJobs <span className="text-[#CCFF00]">Rwanda</span>
+          <span className="font-black tracking-tight uppercase text-sm text-[#FFFFFF]">
+            EliteJobs <span className="text-[#FAD201]">Rwanda</span>
           </span>
         </div>
 
-        {/* Tab Navigation */}
-        <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/10">
+        {/* ACTIVE NAVIGATION TABS (#0B6FA4 ACTIVE) */}
+        <nav className="flex items-center gap-1 bg-[#1C2233] p-1.5 rounded-2xl border border-[#E3E6EC]/10">
           <button
             onClick={() => setActiveTab('ASSETS')}
             className={`px-4 py-2 text-xs font-mono uppercase rounded-xl transition-all ${
-              activeTab === 'ASSETS' ? 'bg-[#CCFF00] text-black font-bold' : 'text-gray-400 hover:text-white'
+              activeTab === 'ASSETS' ? 'bg-[#0B6FA4] text-[#FFFFFF] font-bold' : 'text-[#6B7280] hover:text-[#FFFFFF]'
             }`}
           >
             Assets Command
@@ -39,7 +40,7 @@ export const App: React.FC = () => {
           <button
             onClick={() => setActiveTab('LEAVE')}
             className={`px-4 py-2 text-xs font-mono uppercase rounded-xl transition-all ${
-              activeTab === 'LEAVE' ? 'bg-[#CCFF00] text-black font-bold' : 'text-gray-400 hover:text-white'
+              activeTab === 'LEAVE' ? 'bg-[#0B6FA4] text-[#FFFFFF] font-bold' : 'text-[#6B7280] hover:text-[#FFFFFF]'
             }`}
           >
             Leave Portal
@@ -47,20 +48,20 @@ export const App: React.FC = () => {
           <button
             onClick={() => setActiveTab('DIRECTORY')}
             className={`px-4 py-2 text-xs font-mono uppercase rounded-xl transition-all ${
-              activeTab === 'DIRECTORY' ? 'bg-[#CCFF00] text-black font-bold' : 'text-gray-400 hover:text-white'
+              activeTab === 'DIRECTORY' ? 'bg-[#0B6FA4] text-[#FFFFFF] font-bold' : 'text-[#6B7280] hover:text-[#FFFFFF]'
             }`}
           >
             Org Directory
           </button>
         </nav>
 
-        {/* Role Switcher Indicator */}
+        {/* ROLE INDICATOR */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-gray-500 uppercase">Role:</span>
+          <span className="text-[10px] font-mono text-[#6B7280] uppercase">Role:</span>
           <select
             value={userRole}
             onChange={e => setUserRole(e.target.value as any)}
-            className="bg-[#090B11] border border-white/20 text-xs text-[#CCFF00] font-mono font-bold rounded-xl px-3 py-1.5 focus:outline-none"
+            className="bg-[#1C2233] border border-[#E3E6EC]/20 text-xs text-[#FAD201] font-mono font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:border-[#0B6FA4]"
           >
             <option value="IT_SUPPORT">IT Support</option>
             <option value="ADMIN">Admin / Owner</option>
@@ -69,16 +70,16 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1">
+      {/* MAIN VIEW */}
+      <main className="flex-1 bg-[#12151F]">
         {activeTab === 'ASSETS' && <AssetManagement userRole={userRole} />}
         {activeTab === 'LEAVE' && <LeaveManagement userRole={userRole} />}
         {activeTab === 'DIRECTORY' && <OrgDirectory />}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-4 px-6 text-center text-[10px] font-mono text-gray-500">
-        EliteJobs Rwanda Enterprise OS • Cross-Platform Native Target (EXE / APK / IPA)
+      {/* FOOTER */}
+      <footer className="border-t border-[#E3E6EC]/10 bg-[#12151F] py-4 px-6 text-center text-[10px] font-mono text-[#6B7280]">
+        EliteJobs Rwanda Enterprise Hyper-Platform • Multi-Platform Native Binary Target (EXE / APK / IPA)
       </footer>
     </div>
   );
