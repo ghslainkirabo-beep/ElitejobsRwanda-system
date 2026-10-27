@@ -1,0 +1,6 @@
+{
+  "appId": "rw.elitejobs.system",
+  "appName": "EliteJobs Rwanda",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

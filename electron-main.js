@@ -3,13 +3,14 @@ const path = require('path');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    title: "EliteJobs Enterprise OS - Standalone Edition",
+    width: 1366,
+    height: 768,
+    backgroundColor: '#07090E',
+    title: 'EliteJobs Rwanda Enterprise OS',
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
-    },
+      contextIsolation: false
+    }
   });
 
   if (process.env.NODE_ENV === 'development') {
@@ -20,7 +21,3 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
