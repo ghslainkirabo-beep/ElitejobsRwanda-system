@@ -5,22 +5,23 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    // Immediate GPU trigger on mount
-    requestAnimationFrame(() => {
+    // Fast GPU trigger on mount
+    const mountFrame = requestAnimationFrame(() => {
       setMounted(true);
     });
 
-    // Fast 0.8s lock-in trigger for exit fade
+    // Fast lock-in trigger for exit fade
     const fadeTimer = setTimeout(() => {
       setFading(true);
-    }, 800);
+    }, 900);
 
-    // Complete transition at 1.1s total (instant & responsive)
+    // Complete transition at 1.2s total (responsive entrance)
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 1100);
+    }, 1200);
 
     return () => {
+      cancelAnimationFrame(mountFrame);
       clearTimeout(fadeTimer);
       clearTimeout(completeTimer);
     };
@@ -32,28 +33,56 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
         willChange: 'opacity, transform, filter',
       }}
-      className={`fixed inset-0 z-50 bg-[#0B0E14] flex flex-col items-center justify-center transition-all duration-300 select-none ${
+      className={`fixed inset-0 z-50 bg-[#05070A] flex flex-col items-center justify-center transition-all duration-300 select-none overflow-hidden ${
         fading ? 'opacity-0 scale-105 filter blur-xs' : 'opacity-100 scale-100'
       }`}
     >
-      {/* Ambient Backdrop Blur Glow */}
-      <div className="absolute w-[400px] h-[400px] bg-[#CCFF00]/5 rounded-full blur-[100px] pointer-events-none"></div>
+      {/* EXTREME CHROMATIC MULTI-LAYER GLOW (Electric Lime + Cyan + Hyper Magenta) */}
+      <div className="absolute w-[550px] h-[550px] bg-gradient-to-tr from-[#CCFF00]/15 via-[#00F0FF]/20 to-[#FF007A]/15 rounded-full blur-[130px] pointer-events-none animate-pulse"></div>
+      
+      {/* SECONDARY ROTATING AURORA RING */}
+      <div className="absolute w-[350px] h-[350px] bg-gradient-to-r from-[#00F0FF]/10 to-[#CCFF00]/10 rounded-full blur-[90px] pointer-events-none animate-spin" style={{ animationDuration: '6s' }}></div>
 
-      <div className="relative w-56 h-56 flex items-center justify-center">
-        {/* EXACT PRIMARY LOGO SVG WITH GPU-ACCELERATED APPLE MOTION */}
+      <div className="relative w-60 h-60 flex items-center justify-center">
+        {/* CHROMATIC DROP-SHADOW BEHIND LOGO */}
+        <div 
+          className={`absolute inset-0 bg-gradient-to-r from-[#00F0FF] via-[#CCFF00] to-[#FF007A] opacity-30 rounded-full blur-2xl transition-all duration-500 transform ${
+            mounted ? 'scale-100 opacity-40' : 'scale-75 opacity-0'
+          }`}
+        ></div>
+
+        {/* PRIMARY 'e' LOGO SVG WITH PRISMATIC LIGHT RAYS */}
         <svg
           viewBox="0 0 200 200"
-          className={`w-full h-full drop-shadow-[0_0_25px_rgba(255,255,255,0.1)] transition-all duration-500 transform ${
-            mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+          className={`relative z-10 w-full h-full transition-all duration-500 transform ${
+            mounted ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-90 -rotate-3'
           }`}
-          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)', willChange: 'transform, opacity' }}
+          style={{ 
+            transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)', 
+            willChange: 'transform, opacity',
+            filter: 'drop-shadow(0 0 25px rgba(0, 240, 255, 0.4)) drop-shadow(0 0 45px rgba(204, 255, 0, 0.25))'
+          }}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Floating Circular Dot */}
-          <circle cx="75" cy="54" r="12" fill="#FFFFFF" />
+          <defs>
+            {/* GRADIENT FOR PRISMATIC GLYPH EMBELLISHMENT */}
+            <linearGradient id="electricGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="60%" stopColor="#F0F9FF" />
+              <stop offset="100%" stopColor="#CCFF00" />
+            </linearGradient>
+            
+            <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00F0FF" />
+              <stop offset="100%" stopColor="#CCFF00" />
+            </linearGradient>
+          </defs>
 
-          {/* Exact Primary 'e' Monogram matching Primary logo@2x.png */}
+          {/* Floating Dot with Cyan-to-Lime Neon Fill */}
+          <circle cx="75" cy="54" r="12" fill="url(#dotGrad)" className="shadow-[0_0_15px_#00F0FF]" />
+
+          {/* Exact Primary 'e' Monogram with Electric Gradient */}
           <path
             d="M 108 42
                V 66
@@ -68,25 +97,26 @@ export const SplashLoading: React.FC<{ onComplete: () => void }> = ({ onComplete
                H 156
                V 90
                C 156 62 136 42 108 42 Z"
-            fill="#FFFFFF"
+            fill="url(#electricGrad)"
           />
         </svg>
       </div>
 
-      {/* Brand Title Reveal */}
+      {/* BRAND TITLE WITH DYNAMIC CHROMATIC TEXT GRADIENT */}
       <div
         style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-        className={`mt-1 transition-all duration-400 transform flex flex-col items-center ${
+        className={`mt-2 transition-all duration-400 transform flex flex-col items-center z-10 ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}
       >
-        <h1 className="text-white text-sm font-bold tracking-[0.3em] uppercase font-mono mb-4">
+        <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#00F0FF] to-[#CCFF00] text-sm font-black tracking-[0.35em] uppercase font-mono mb-4">
           ELITEJOBS<span className="text-[#CCFF00]">.RW</span>
         </h1>
 
-        {/* APPLE-STYLE FLUID SPINNER MOTION (ALTUVERA STYLE) */}
-        <div className="relative w-5 h-5 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-white/15 border-t-[#CCFF00] rounded-full animate-spin"></div>
+        {/* HIGH-PRECISION DUAL-RING ELECTRIC SPINNER */}
+        <div className="relative w-6 h-6 flex items-center justify-center">
+          <div className="absolute inset-0 border-2 border-transparent border-t-[#00F0FF] border-r-[#CCFF00] rounded-full animate-spin" style={{ animationDuration: '0.7s' }}></div>
+          <div className="w-3 h-3 border-2 border-transparent border-b-[#FF007A] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.9s' }}></div>
         </div>
       </div>
     </div>
