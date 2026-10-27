@@ -61,17 +61,14 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
   const [showReplaceModal, setShowReplaceModal] = useState(false);
   const [selectedDamagedAsset, setSelectedDamagedAsset] = useState<CompanyAsset | null>(null);
 
-  // Form states for new registration
   const [itemName, setItemName] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
   const [category, setCategory] = useState<CompanyAsset['category']>('Laptop');
   const [assignedTo, setAssignedTo] = useState('Unassigned');
 
-  // Form states for replacement purchase
   const [newItemName, setNewItemName] = useState('');
   const [newSerialNumber, setNewSerialNumber] = useState('');
 
-  // Admin Statistics Calculations
   const totalAssets = assets.length;
   const workingWell = assets.filter((a) => a.status === 'ASSIGNED' || a.status === 'IN_STOCK').length;
   const underMaintenance = assets.filter((a) => a.status === 'UNDER_MAINTENANCE').length;
@@ -97,21 +94,18 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
     setSerialNumber('');
   };
 
-  // IT Workflow: Handle Replace / New Purchase for Damaged Asset
   const handleReplaceAssetSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDamagedAsset) return;
 
     const assignedStaff = selectedDamagedAsset.assignedTo;
 
-    // 1. Update old damaged asset: Mark as REPLACED_PURCHASED & unassign staff
     const updatedAssets = assets.map((a) =>
       a.id === selectedDamagedAsset.id
         ? { ...a, status: 'REPLACED_PURCHASED' as const, condition: 'Critical' as const, assignedTo: `Decommissioned (${assignedStaff})` }
         : a
     );
 
-    // 2. Add newly purchased asset assigned directly to the colleague
     const newReplacementAsset: CompanyAsset = {
       id: `AST-00${updatedAssets.length + 1}`,
       itemName: newItemName,
@@ -137,78 +131,93 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
   };
 
   return (
-    <div className="flex h-screen bg-[#f4f6f9] font-sans">
-      {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-5 font-bold text-[#714b67] text-lg border-b border-gray-100">
-          {isIT ? '🛠️ IT Asset Command' : '📊 Admin Asset Audit'}
-        </div>
-        <div className="p-4 space-y-2 text-sm font-medium text-gray-600">
-          <div className="p-2.5 bg-[#f0f2f5] text-[#714b67] rounded-lg font-bold cursor-pointer">
-            {isIT ? '💻 Equipment Control' : '📈 Executive Statistics'}
+    <div className="flex h-screen bg-[#0A0D0C] text-white font-sans overflow-hidden">
+      {/* Apple Monochrome Frosted Sidebar */}
+      <div className="w-64 bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col justify-between p-6">
+        <div>
+          <div className="flex items-center space-x-3 mb-8">
+            <div className="w-9 h-9 bg-[#CCFF00] text-[#0B0F0E] rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_20px_rgba(204,255,0,0.2)]">
+              E
+            </div>
+            <div>
+              <h2 className="font-bold text-sm tracking-wide text-white">EliteJobs</h2>
+              <p className="text-[10px] text-gray-400 font-mono tracking-widest uppercase">Rwanda OS</p>
+            </div>
           </div>
-          {isIT && (
-            <>
-              <div className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer">📦 Vault (In Stock)</div>
-              <div className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer">⚠️ Error & Damaged Queue</div>
-            </>
-          )}
+
+          <div className="space-y-1 text-xs font-semibold">
+            <div className="px-3 py-2.5 bg-white/10 text-[#CCFF00] rounded-xl border border-white/10 flex items-center justify-between">
+              <span>{isIT ? '💻 Equipment Control' : '📈 Executive Stats'}</span>
+              <span className="w-2 h-2 rounded-full bg-[#CCFF00]"></span>
+            </div>
+            {isIT && (
+              <>
+                <div className="px-3 py-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                  📦 Vault (In Stock)
+                </div>
+                <div className="px-3 py-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                  ⚠️ Error Queue
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="p-3 bg-white/5 border border-white/10 rounded-2xl text-[11px] text-gray-400 font-mono">
+          <p className="text-white font-semibold mb-0.5">Standalone Engine</p>
+          <p>Local Encryption Active</p>
         </div>
       </div>
 
-      {/* Main Area */}
-      <div className="flex-1 flex flex-col p-8 overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
+      {/* Main Workspace with Frosted Backdrop */}
+      <div className="flex-1 flex flex-col p-8 overflow-y-auto bg-gradient-to-br from-[#0A0D0C] via-[#0E1311] to-[#0A0D0C]">
+        <div className="flex justify-between items-end mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-[#303133]">
+            <span className="text-[#CCFF00] font-mono text-xs uppercase tracking-widest">Enterprise System</span>
+            <h1 className="text-3xl font-black text-white mt-1 tracking-tight">
               {isIT ? 'IT Master Equipment & Replacement Console' : 'Executive Hardware Usage & Health Statistics'}
             </h1>
-            <p className="text-sm text-gray-500">
-              {isIT
-                ? 'Manage serial numbers, process hardware errors, and register newly purchased replacements.'
-                : 'High-level overview of enterprise hardware integrity, maintenance rates, and error logs.'}
-            </p>
           </div>
           {isIT && (
             <button
               onClick={() => setShowRegisterModal(true)}
-              className="px-4 py-2 bg-[#714b67] text-white font-bold text-xs rounded-lg shadow hover:bg-[#5b3c52]"
+              className="px-5 py-2.5 bg-[#CCFF00] text-[#0B0F0E] font-bold text-xs rounded-xl shadow-[0_0_25px_rgba(204,255,0,0.25)] hover:bg-[#b3e600] transition-all"
             >
               + REGISTER NEW ASSET
             </button>
           )}
         </div>
 
-        {/* ADMIN STATISTICAL OVERVIEW CARDS */}
+        {/* ADMIN FROSTED STATISTICAL CARDS */}
         {!isIT && (
           <div className="grid grid-cols-4 gap-4 mb-8">
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-xs font-bold text-gray-400 uppercase">Hardware Health Score</p>
-              <p className="text-3xl font-black text-green-600 mt-2">{healthPercentage}%</p>
-              <p className="text-xs text-gray-500 mt-1">Working to company standard</p>
+            <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Health Score</p>
+              <p className="text-3xl font-black text-[#CCFF00] mt-2">{healthPercentage}%</p>
+              <p className="text-xs text-gray-400 mt-1">Working to standard</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-xs font-bold text-gray-400 uppercase">Working Operational</p>
-              <p className="text-3xl font-black text-gray-800 mt-2">{workingWell} Units</p>
-              <p className="text-xs text-green-600 mt-1">Active deployment</p>
+            <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Operational</p>
+              <p className="text-3xl font-black text-white mt-2">{workingWell} Units</p>
+              <p className="text-xs text-gray-400 mt-1">Active deployment</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-xs font-bold text-gray-400 uppercase">Under Maintenance</p>
-              <p className="text-3xl font-black text-amber-600 mt-2">{underMaintenance} Units</p>
-              <p className="text-xs text-amber-600 mt-1">In IT repair shop</p>
+            <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Under Maintenance</p>
+              <p className="text-3xl font-black text-amber-400 mt-2">{underMaintenance} Units</p>
+              <p className="text-xs text-amber-400/70 mt-1">In IT repair shop</p>
             </div>
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-xs font-bold text-gray-400 uppercase">System Errors Reported</p>
-              <p className="text-3xl font-black text-red-600 mt-2">{systemErrors} Devices</p>
-              <p className="text-xs text-red-500 mt-1">Action required by IT</p>
+            <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">System Errors</p>
+              <p className="text-3xl font-black text-red-400 mt-2">{systemErrors} Devices</p>
+              <p className="text-xs text-red-400/70 mt-1">Requires IT review</p>
             </div>
           </div>
         )}
 
-        {/* ASSET DATA TABLE */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 uppercase text-xs">
+        {/* FROSTED GLASS ASSET TABLE */}
+        <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+          <table className="w-full text-left text-sm text-gray-300">
+            <thead className="bg-white/5 text-gray-400 font-mono uppercase text-[10px] border-b border-white/10">
               <tr>
                 <th className="p-4">Asset ID</th>
                 <th className="p-4">Item & Serial Number</th>
@@ -216,57 +225,48 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
                 <th className="p-4">Assigned Colleague</th>
                 <th className="p-4">Condition</th>
                 <th className="p-4">Operational Status</th>
-                {isIT && <th className="p-4">IT Quick Actions</th>}
+                {isIT && <th className="p-4">IT Controls</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-white/5 text-xs">
               {assets.map((a) => (
-                <tr key={a.id} className="hover:bg-gray-50">
-                  <td className="p-4 font-mono font-bold text-[#714b67]">{a.id}</td>
+                <tr key={a.id} className="hover:bg-white/5 transition-colors">
+                  <td className="p-4 font-mono font-bold text-[#CCFF00]">{a.id}</td>
                   <td className="p-4">
-                    <div className="font-bold text-gray-800">{a.itemName}</div>
-                    <div className="text-xs font-mono text-gray-400">S/N: {a.serialNumber}</div>
+                    <div className="font-bold text-white text-sm">{a.itemName}</div>
+                    <div className="text-[10px] font-mono text-gray-400">S/N: {a.serialNumber}</div>
                   </td>
-                  <td className="p-4 font-semibold text-gray-700">{a.category}</td>
-                  <td className="p-4 font-medium text-gray-800">{a.assignedTo}</td>
+                  <td className="p-4 font-semibold text-gray-300">{a.category}</td>
+                  <td className="p-4 font-medium text-white">{a.assignedTo}</td>
                   <td className="p-4">
-                    <span
-                      className={`px-2.5 py-1 text-xs font-bold rounded-full ${
-                        a.condition === 'Excellent'
-                          ? 'bg-green-100 text-green-700'
-                          : a.condition === 'Good'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}
-                    >
+                    <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-white/10 text-gray-200 border border-white/10">
                       {a.condition}
                     </span>
                   </td>
                   <td className="p-4">
                     <span
-                      className={`px-2.5 py-1 text-xs font-bold rounded-full ${
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
                         a.status === 'ASSIGNED'
-                          ? 'bg-purple-100 text-purple-700'
+                          ? 'bg-[#CCFF00]/10 text-[#CCFF00] border-[#CCFF00]/30'
                           : a.status === 'IN_STOCK'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
                           : a.status === 'UNDER_MAINTENANCE'
-                          ? 'bg-amber-100 text-amber-800'
+                          ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                           : a.status === 'SYSTEM_ERROR'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-gray-200 text-gray-700'
+                          ? 'bg-red-500/10 text-red-400 border-red-500/30'
+                          : 'bg-white/5 text-gray-400 border-white/10'
                       }`}
                     >
                       {a.status.replace('_', ' ')}
                     </span>
                   </td>
 
-                  {/* IT-ONLY ACTIONS */}
                   {isIT && (
                     <td className="p-4 flex items-center space-x-2">
                       <select
                         value={a.status}
                         onChange={(e) => handleUpdateStatus(a.id, e.target.value as CompanyAsset['status'])}
-                        className="text-xs bg-gray-100 border border-gray-300 rounded px-2 py-1 font-bold focus:outline-none"
+                        className="text-xs bg-[#121816] text-white border border-white/10 rounded-xl px-2.5 py-1.5 font-semibold focus:outline-none focus:border-[#CCFF00]"
                       >
                         <option value="ASSIGNED">Assigned / Active</option>
                         <option value="IN_STOCK">In Stock (Vault)</option>
@@ -280,8 +280,7 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
                             setSelectedDamagedAsset(a);
                             setShowReplaceModal(true);
                           }}
-                          className="px-2.5 py-1 bg-red-600 text-white font-bold text-xs rounded hover:bg-red-700"
-                          title="Register newly purchased device for this staff member"
+                          className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 font-bold text-xs rounded-xl transition-all"
                         >
                           Replace New 🔄
                         </button>
@@ -295,18 +294,18 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
         </div>
       </div>
 
-      {/* IT Register New Asset Modal */}
+      {/* APPLE FROSTED MODALS */}
       {showRegisterModal && isIT && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Register New Equipment (IT Master)</h2>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-[#121816] border border-white/10 w-full max-w-md rounded-3xl p-6 shadow-[0_25px_60px_rgba(0,0,0,0.8)]">
+            <h2 className="text-xl font-black text-white mb-4">Register New Equipment</h2>
             <form onSubmit={handleCreateAsset} className="space-y-3">
               <input
                 type="text"
                 placeholder="Item Name"
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                className="w-full px-4 py-3 bg-[#1B2421] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#CCFF00]"
                 required
               />
               <input
@@ -314,13 +313,13 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
                 placeholder="Hardware Serial Number"
                 value={serialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                className="w-full px-4 py-3 bg-[#1B2421] border border-white/10 rounded-xl text-white text-sm font-mono focus:outline-none focus:border-[#CCFF00]"
                 required
               />
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as CompanyAsset['category'])}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50"
+                className="w-full px-4 py-3 bg-[#1B2421] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#CCFF00]"
               >
                 <option value="Laptop">Laptop</option>
                 <option value="Mobile Device">Mobile Device</option>
@@ -332,76 +331,22 @@ export const AssetManagement: React.FC<{ userRole: string }> = ({ userRole }) =>
                 placeholder="Assigned Staff (or 'Unassigned')"
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                className="w-full px-4 py-3 bg-[#1B2421] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#CCFF00]"
                 required
               />
               <div className="flex justify-end space-x-2 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowRegisterModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white rounded-xl"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-[#714b67] text-white rounded-lg shadow hover:bg-[#5b3c52]"
+                  className="px-5 py-2.5 text-xs font-bold bg-[#CCFF00] text-[#0B0F0E] rounded-xl shadow-lg hover:bg-[#b3e600]"
                 >
                   SAVE & REGISTER
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* IT Replace / New Purchase Modal */}
-      {showReplaceModal && selectedDamagedAsset && isIT && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border-2 border-red-500">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">Replace Damaged Asset</h2>
-            <p className="text-xs text-gray-500 mb-4">
-              Registering newly purchased replacement for <strong className="text-red-600">{selectedDamagedAsset.assignedTo}</strong>.
-            </p>
-
-            <form onSubmit={handleReplaceAssetSubmit} className="space-y-3">
-              <div className="p-3 bg-red-50 text-red-800 rounded-lg text-xs font-mono mb-2">
-                Replacing: {selectedDamagedAsset.itemName} (S/N: {selectedDamagedAsset.serialNumber})
-              </div>
-
-              <input
-                type="text"
-                placeholder="New Purchased Model (e.g. MacBook Pro M3)"
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                required
-              />
-              <input
-                type="text"
-                placeholder="New Serial Number"
-                value={newSerialNumber}
-                onChange={(e) => setNewSerialNumber(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono"
-                required
-              />
-
-              <div className="flex justify-end space-x-2 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowReplaceModal(false);
-                    setSelectedDamagedAsset(null);
-                  }}
-                  className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg"
-                >
-                  CANCEL
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-xs font-bold bg-red-600 text-white rounded-lg shadow hover:bg-red-700"
-                >
-                  CONFIRM REPLACEMENT & ASSIGN
                 </button>
               </div>
             </form>
