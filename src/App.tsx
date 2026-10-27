@@ -75,14 +75,24 @@ export function App() {
       {/* Universal Status & Module Navigation */}
       <div className="fixed top-3 right-5 z-50 bg-[#0B0F0E] text-white px-4 py-2 rounded-full text-xs font-semibold flex items-center space-x-3 shadow-xl border border-white/10">
         <span className="text-[#CCFF00] font-mono">ROLE: {userPosition.toUpperCase()}</span>
-        <button onClick={() => setActiveTab('WORKSPACE')} className={`hover:text-[#CCFF00] ${activeTab === 'WORKSPACE' ? 'text-[#CCFF00] font-bold' : ''}`}>Workspace</button>
+        <button 
+          onClick={() => setActiveTab('WORKSPACE')} 
+          className={`hover:text-[#CCFF00] ${activeTab === 'WORKSPACE' ? 'text-[#CCFF00] font-bold' : ''}`}
+        >
+          Workspace
+        </button>
         {(userPosition === 'IT Support' || userPosition === 'Admin / Owner') && (
-          <button onClick={() => setActiveTab('ASSETS')} className={`hover:text-[#CCFF00] ${activeTab === 'ASSETS' ? 'text-[#CCFF00] font-bold' : ''}`}>Assets</button>
+          <button 
+            onClick={() => setActiveTab('ASSETS')} 
+            className={`hover:text-[#CCFF00] ${activeTab === 'ASSETS' ? 'text-[#CCFF00] font-bold' : ''}`}
+          >
+            Assets
+          </button>
         )}
         <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 border-l border-white/10 pl-3">Log Out</button>
       </div>
 
-      {/* Dynamic View Switching */}
+      {/* Dynamic View Routing */}
       {activeTab === 'ASSETS' ? (
         <AssetManagement userRole={userPosition} />
       ) : (
